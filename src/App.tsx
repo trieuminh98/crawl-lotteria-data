@@ -68,35 +68,37 @@ function App() {
 
   function exportJSONToExcel(sheetName = "Sheet1", fileName = "output.xlsx") {
     // Tạo một workbook mới
-
-    const finalData = storeData.map((i) => {
-      const number = [] as string[];
-      i.data.forEach((i) => {
+    if (storeData && storeData.length > 0) {
+      const finalData = storeData.map((i) => {
+        const number = [] as string[];
         i.data.forEach((i) => {
-          number.push(i);
+          i.data.forEach((i) => {
+            number.push(i);
+          });
         });
+        const a = {} as any;
+        number.forEach((i, index) => {
+          a[`G${index + 1}`] = getLastTwoString(i);
+        });
+        return {
+          date: i.date,
+          ...a,
+        };
       });
-      const a = {} as any;
-      number.forEach((i, index) => {
-        a[`G${index + 1}`] = getLastTwoString(i);
-      });
-      return {
-        date: i.date,
-        ...a,
-      };
-    });
-    //
-    console.log(finalData);
-    const workbook = XLSX.utils.book_new();
+      //
+      console.log(finalData);
+      const workbook = XLSX.utils.book_new();
 
-    // Chuyển đổi JSON thành worksheet
-    const worksheet = XLSX.utils.json_to_sheet(finalData);
+      // Chuyển đổi JSON thành worksheet
+      const worksheet = XLSX.utils.json_to_sheet(finalData);
 
-    // Thêm worksheet vào workbook
-    XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+      // Thêm worksheet vào workbook
+      XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
 
-    // Ghi workbook ra file Excel
-    XLSX.writeFile(workbook, fileName);
+      // Ghi workbook ra file Excel
+      XLSX.writeFile(workbook, fileName);
+      setStoreData([]);
+    }
   }
   return (
     <Box>
