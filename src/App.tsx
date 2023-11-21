@@ -22,15 +22,16 @@ type FullData = {
   data: LotteriaNumber[];
 };
 
+const removeFalsy = <T,>(arr: T[]) => arr.filter(Boolean);
+
+const getLastTwoString = (str: string) => {
+  return str.substring(str.length - 2, str.length);
+};
+
 function App() {
   const [text, setText] = useState("");
   const [saveText, setSaveText] = useState("");
   const [storeData, setStoreData] = useState<FullData[]>([]);
-
-  const getLastTwoString = (str: string) => {
-    return str.substring(str.length - 2, str.length);
-  };
-
   const crawlData = () => {
     const elements = document.querySelectorAll(".box_kqxs");
     const data = [] as FullData[];
@@ -61,8 +62,21 @@ function App() {
         data: giaiArr2,
       });
     });
-    setStoreData(storeData.concat(data));
-    console.log(data);
+    const duplicatedNumber = [] as string[];
+    const finalData = removeFalsy(
+      storeData.concat(data).map((i) => {
+        if (!duplicatedNumber.includes(i.date)) {
+          duplicatedNumber.push(i.date);
+          return i;
+        }
+      })
+    ) as FullData[];
+    finalData.sort(function (a, b) {
+      const a1 = a.date.split("/").reverse().join("");
+      const b1 = b.date.split("/").reverse().join("");
+      return a1.localeCompare(b1); // <-- alternative
+    });
+    setStoreData(finalData);
     setSaveText("");
   };
 
